@@ -1,0 +1,75 @@
+# Production stack: prebuilt images, non-root processes, healthchecks, single public port.
+#   docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?set in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    image: ${IMAGE_REGISTRY:?set in .env}/backend:${IMAGE_TAG:-latest}
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "false"
+      APP_SECRET_KEY: ${APP_SECRET_KEY:?set in .env}
+      APP_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      APP_REDIS_URL: redis://redis:6379/0
+      APP_CORS_ORIGINS: ${APP_CORS_ORIGINS:-}
+      APP_LOG_JSON: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # One-shot migration job; `docker compose -f docker-compose.prod.yml run --rm migrate`
+  migrate:
+    image: ${IMAGE_REGISTRY:?set in .env}/backend:${IMAGE_TAG:-latest}
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      APP_SECRET_KEY: ${APP_SECRET_KEY:?set in .env}
+      APP_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      APP_REDIS_URL: ""
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["tools"]
+
+  web:
+    image: ${IMAGE_REGISTRY:?set in .env}/web:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: prod
+    ports:
+      - "${PUBLIC_PORT:-80}:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:
