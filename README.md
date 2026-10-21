@@ -10,6 +10,15 @@ A production-shaped starter for full-stack client projects: async FastAPI + Post
 ![React](https://img.shields.io/badge/React-18.3-61dafb)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+## Try it live
+
+| | |
+|---|---|
+| API reference | https://akibullah.github.io/docker-fastapi-react-template/ — Swagger UI rendered from the exported `openapi.json` (static; the Codespace runs the real service) |
+| Run in your browser | [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/AkibUllah/docker-fastapi-react-template?quickstart=1) — `docker compose up` with Postgres, Redis, API, Vite and nginx; open port 8080 for the app and sign in with `admin@example.com` / `Admin12345` (created at start-up), or port 8000 for `/api/v1/docs` |
+| One-click deploy | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AkibUllah/docker-fastapi-react-template) — API, SPA, free Postgres and Key Value from `render.yaml`; you choose the first superuser's email and password at deploy time |
+| Local | `cp .env.example .env && make up` (see Quick Start) |
+
 ## Why this exists
 
 Every client engagement I have started spent its first week on the same plumbing: an API skeleton with auth, a database that migrates instead of being recreated, a frontend that talks to it without CORS surprises, a compose file that works on a teammate's laptop, and a CI pipeline that fails before a broken build reaches a server. This template is that first week, written once and kept honest by tests. It encodes the decisions I keep making for payment and e-commerce backends (async I/O, refresh-token rotation, structured logs with request IDs, nginx in front) and leaves the domain code empty on purpose.
@@ -66,7 +75,7 @@ git clone git@github.com:AkibUllah/docker-fastapi-react-template.git my-project
 cd my-project
 cp .env.example .env
 make up                                  # nginx :8080, API :8000, Vite :5173, Postgres, Redis
-make superuser ARGS="admin@example.com Admin12345"
+make superuser ARGS="admin@example.com Admin12345"   # or set APP_FIRST_SUPERUSER_* in .env before `make up`
 open http://localhost:8080               # UI;  http://localhost:8080/api/v1/docs for OpenAPI
 ```
 
@@ -133,7 +142,7 @@ frontend/
 │   ├── pages/             Login, Register, Dashboard, Profile, Users, NotFound
 │   └── test/              12 vitest tests
 └── Dockerfile             node build stage + nginx prod stage (context: repo root)
-nginx/                     dev.conf, prod.conf, snippets (headers, gzip, proxy)
+nginx/                     dev.conf, prod.conf.template, snippets (headers, gzip, proxy)
 scripts/                   wait-for-it.sh, create_superuser.py
 docs/adr/                  0001 async FastAPI · 0002 nginx · 0003 Alembic
 docker-compose.yml · docker-compose.prod.yml · Makefile · .pre-commit-config.yaml
