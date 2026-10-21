@@ -1,3 +1,4 @@
+<!-- topics: fastapi,react,typescript,docker,docker-compose,nginx,postgresql,redis,alembic,github-actions,template,boilerplate -->
 # Docker FastAPI React Template
 
 A production-shaped starter for full-stack client projects: async FastAPI + Postgres + Redis behind nginx, a React/TypeScript SPA, JWT auth end to end, migrations, tests, CI and a deploy pipeline, all runnable with one `make up`.
