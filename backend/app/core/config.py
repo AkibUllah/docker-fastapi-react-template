@@ -33,6 +33,17 @@ class Settings(BaseSettings):
     first_superuser_email: str | None = None
     first_superuser_password: str | None = None
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalise_database_url(cls, value: object) -> object:
+        """Managed Postgres providers (Render, Heroku-style) hand out ``postgres://`` or
+        ``postgresql://`` URLs; route them through the asyncpg driver this app uses."""
+        if isinstance(value, str):
+            for prefix in ("postgres://", "postgresql://"):
+                if value.startswith(prefix):
+                    return "postgresql+asyncpg://" + value[len(prefix) :]
+        return value
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def split_origins(cls, value: object) -> object:

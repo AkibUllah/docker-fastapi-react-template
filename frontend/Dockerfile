@@ -13,7 +13,9 @@ RUN npm run build
 FROM nginx:1.27-alpine AS prod
 RUN rm /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx/prod.conf /etc/nginx/conf.d/default.conf
+# Rendered to conf.d/default.conf at start-up; only the three listed variables are substituted.
+COPY nginx/prod.conf.template /etc/nginx/templates/default.conf.template
 COPY nginx/snippets /etc/nginx/snippets
+ENV PORT=80 API_HOST=backend API_PORT=8000 NGINX_ENVSUBST_FILTER="^(PORT|API_HOST|API_PORT)$"
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://127.0.0.1/healthz || exit 1

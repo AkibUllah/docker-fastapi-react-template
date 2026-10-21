@@ -1,6 +1,7 @@
-# Production: static SPA build + /api proxy. Served from the image built by frontend/Dockerfile.
+# Production: static SPA build + /api proxy. Served from the image built by frontend/Dockerfile,
+# whose nginx entrypoint substitutes ${PORT}, ${API_HOST} and ${API_PORT} (defaults: 80, backend, 8000).
 server {
-    listen 80;
+    listen ${PORT};
     server_name _;
     root /usr/share/nginx/html;
     index index.html;
@@ -8,7 +9,7 @@ server {
     include /etc/nginx/snippets/common.conf;
 
     location /api/ {
-        proxy_pass http://backend:8000;
+        proxy_pass http://${API_HOST}:${API_PORT};
         include /etc/nginx/snippets/proxy.conf;
     }
 

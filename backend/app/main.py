@@ -15,6 +15,7 @@ from app.core.cache import TokenDenylist, create_redis
 from app.core.config import Settings, get_settings
 from app.core.logging import RequestContextMiddleware, configure_logging
 from app.db.session import create_engine, create_session_factory
+from app.services.bootstrap import ensure_first_superuser
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.session_factory = create_session_factory(engine)
         app.state.redis = redis
         app.state.denylist = TokenDenylist(redis)
+        if await ensure_first_superuser(settings, app.state.session_factory):
+            logger.info("created first superuser", extra={"email": settings.first_superuser_email})
         logger.info("startup", extra={"env": settings.env, "version": __version__})
         try:
             yield
