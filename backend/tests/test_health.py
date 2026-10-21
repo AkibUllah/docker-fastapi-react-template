@@ -13,9 +13,9 @@ async def test_ready_checks_database_and_redis(client):
     assert response.json() == {"status": "ok", "database": "ok", "redis": "ok"}
 
 
-async def test_request_id_is_generated_or_propagated(client):
-    generated = await client.get("/api/v1/health/live")
-    assert len(generated.headers["X-Request-ID"]) == 32
+async def test_request_id_is_assigned_or_propagated(client):
+    assigned = await client.get("/api/v1/health/live")
+    assert len(assigned.headers["X-Request-ID"]) == 32
     echoed = await client.get("/api/v1/health/live", headers={"X-Request-ID": "trace-123"})
     assert echoed.headers["X-Request-ID"] == "trace-123"
 

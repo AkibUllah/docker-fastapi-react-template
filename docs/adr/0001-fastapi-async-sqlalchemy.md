@@ -8,7 +8,7 @@ Client projects that start from this template are typically I/O-bound APIs: they
 call Postgres, Redis, payment providers (bKash, SSLCommerz) and SMS gateways, and
 spend most of a request waiting on the network. We want one worker process to
 handle many concurrent requests without a thread pool per connection, typed
-request/response models, and generated OpenAPI documentation for the frontend team.
+request/response models, and automatic OpenAPI documentation for the frontend team.
 
 ## Decision
 

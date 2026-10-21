@@ -41,7 +41,7 @@ Key decisions (full write-ups in [`docs/adr/`](docs/adr)):
 
 - **Async all the way down.** I/O-bound APIs spend their time waiting on Postgres and third parties; asyncio with asyncpg handles that concurrency in one process. Business logic lives in `app/services` and takes an `AsyncSession`, so it is reusable from scripts and tests without HTTP.
 - **Rotating refresh tokens with revocation.** Access tokens are short-lived and stateless; refresh tokens carry a `jti` that is denylisted in Redis on rotation and logout, so a leaked refresh token is single-use. Without Redis the denylist degrades to in-process memory and logs a warning.
-- **One origin behind nginx.** No CORS in production, static assets cached properly, request IDs generated at the edge and carried into application logs.
+- **One origin behind nginx.** No CORS in production, static assets cached properly, request IDs assigned at the edge and carried into application logs.
 - **Migrations are explicit.** The app never calls `create_all`; dev compose runs `alembic upgrade head` before uvicorn, production runs a dedicated `migrate` service before the new image starts.
 - **Tests do not need services.** Backend tests run on in-memory SQLite and fakeredis through the real async session code; frontend tests fake the HTTP layer with an axios adapter, so the refresh interceptor is tested for concurrency, not just the happy path.
 
