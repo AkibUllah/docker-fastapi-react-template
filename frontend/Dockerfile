@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.6
 # Stage 1: build the SPA. Stage 2: serve it with nginx (also proxies /api to the backend).
 # Build context is the repository root: docker build -f frontend/Dockerfile .
-FROM node:18-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --no-audit --no-fund
