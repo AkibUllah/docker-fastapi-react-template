@@ -143,7 +143,7 @@ backend/
 │   ├── services/          UserService (no HTTP knowledge)
 │   └── api/               deps (DB session, current user), routes: health, auth, users
 ├── alembic/               async env.py, versions/0001_create_users.py
-├── tests/                 21 tests on SQLite + fakeredis
+├── tests/                 28 tests on SQLite + fakeredis
 └── Dockerfile             targets: dev (reload) · prod (non-root, 4 workers, healthcheck)
 frontend/
 ├── src/
