@@ -4,6 +4,8 @@
 A production-shaped starter for full-stack client projects: async FastAPI + Postgres + Redis behind nginx, a React/TypeScript SPA, JWT auth end to end, migrations, tests, CI and a deploy pipeline, all runnable with one `make up`.
 
 [![CI](https://github.com/AkibUllah/docker-fastapi-react-template/actions/workflows/ci.yml/badge.svg)](https://github.com/AkibUllah/docker-fastapi-react-template/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/AkibUllah/docker-fastapi-react-template/actions/workflows/codeql.yml/badge.svg)](https://github.com/AkibUllah/docker-fastapi-react-template/actions/workflows/codeql.yml)
+[![Release](https://img.shields.io/github/v/release/AkibUllah/docker-fastapi-react-template)](https://github.com/AkibUllah/docker-fastapi-react-template/releases)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)
 ![Node](https://img.shields.io/badge/node-18%20%7C%2020-339933)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)
@@ -18,6 +20,16 @@ A production-shaped starter for full-stack client projects: async FastAPI + Post
 | Run in your browser | [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/AkibUllah/docker-fastapi-react-template?quickstart=1) — `docker compose up` with Postgres, Redis, API, Vite and nginx; open port 8080 for the app and sign in with `admin@example.com` / `Admin12345` (created at start-up), or port 8000 for `/api/v1/docs` |
 | One-click deploy | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AkibUllah/docker-fastapi-react-template) — API, SPA, free Postgres and Key Value from `render.yaml`; you choose the first superuser's email and password at deploy time |
 | Local | `cp .env.example .env && make up` (see Quick Start) |
+
+## Screenshots
+
+![Swagger UI listing the health, auth and users endpoints](docs/images/api-reference.png)
+
+*API reference on GitHub Pages, rendered from the exported OpenAPI document.*
+
+![Terminal running a curl session: readiness, register, duplicate email, login, me, a forbidden users list and the admin view](docs/images/curl-session.png)
+
+*A real curl session against the API on a local port (SQLite, no Redis): registration, the 409 on a duplicate email, JWT login, and the superuser-only users list (403 for a normal user, paginated for the start-up admin).*
 
 ## Why this exists
 
@@ -156,17 +168,17 @@ make test            # backend pytest + frontend vitest
 make lint            # ruff, mypy --strict, eslint, tsc
 ```
 
-Backend (21 tests): liveness/readiness, request-id propagation, OpenAPI under the prefix, password hashing, register/login/me, duplicate and weak passwords, inactive users, token type confusion, refresh rotation and reuse detection, logout revocation, expired tokens, superuser-only listing with pagination, create/duplicate, self vs. others authorisation, role escalation blocked, superuser updates/deletes, self-delete blocked, deleted-user tokens rejected.
+Backend (28 tests): liveness/readiness, request-id propagation, OpenAPI under the prefix, password hashing, register/login/me, duplicate and weak passwords, inactive users, token type confusion, refresh rotation and reuse detection, logout revocation, expired tokens, superuser-only listing with pagination, create/duplicate, self vs. others authorisation, role escalation blocked, superuser updates/deletes, self-delete blocked, deleted-user tokens rejected.
 
 Frontend (12 tests): token storage persistence and subscriptions, bearer header injection, single shared refresh across concurrent 401s with retry, session cleared when refresh fails, no refresh on login failures, error-message formatting, login redirect round-trip, client-side validation, server error display, superuser route guard both ways.
 
 ## Roadmap
 
-- Email verification and password reset with a pluggable mailer (console backend in dev)
-- Rate limiting on auth routes (Redis sliding window) and login lockout
-- OpenTelemetry traces exported from both nginx request IDs and the backend
-- Optional Celery or arq worker service with a compose profile
-- Cookie-based refresh token variant for apps that must not store tokens in localStorage
+- [ ] Email verification and password reset with a pluggable mailer (console backend in dev) (#2)
+- [ ] Rate limiting on auth routes (Redis sliding window) and login lockout (#3)
+- [ ] OpenTelemetry traces exported from both nginx request IDs and the backend (#4)
+- [ ] Optional Celery or arq worker service with a compose profile (#5)
+- [ ] Cookie-based refresh token variant for apps that must not store tokens in localStorage (#6)
 
 ## License
 
