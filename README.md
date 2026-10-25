@@ -96,7 +96,7 @@ make build                               # or let deploy.yml push images to GHCR
 make prod-up                             # pull, migrate, start; nginx on ${PUBLIC_PORT:-80}
 ```
 
-`deploy.yml` needs four repository secrets: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_PATH` (the directory on the server holding `docker-compose.prod.yml` and `.env`). It runs on `v*` tags or manually with an image tag.
+`deploy.yml` needs four repository secrets: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_PATH` (the directory on the server holding `docker-compose.prod.yml` and `.env`). It runs on `v*` tags or manually with an image tag. Every run builds and pushes `ghcr.io/<owner>/<repo>/backend` and `/web` (the path is lowercased, as GHCR requires); the SSH deploy job runs only after you set the repository variable `DEPLOY_ENABLED=true`, so a fork or a repo without a server never fails on a release.
 
 ## API
 
